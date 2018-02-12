@@ -1,46 +1,47 @@
 # dprobe
 Docker security auditing tool
 
-## Security features
-- DONE: Compare running version with current stable
-- DONE: Check live restore
-- Audit running containers:
-    - DONE: Check if they are `Privileged`
-    - DONE: Check if they have `Capabilities`
-    - Check if they are running outdated image
-    - DONE: Ensure memory limits are set per container
-    - DONE: Each container should have HEALTHCHECK
-    - DONE: Mount propagation
-    - DONE: Check if container is using ports < 1024
-    - DONE: Do not allow containers access to hosts process namespace
-    - DONE: Do not allow containers access to hosts IPC namespace
-    - DONE: Do not allow containers access to hosts UTS namespace
-    - DONE: Do not allow containers access to hosts devices
-- Docker daemon audit:
-    - DONE: Docker file/directory ownership
-    - DONE: Docker file/directory mode
-    - Disable swarm mode if it's not in use
-- DONE: Container sprawl
-- DONE: Image sprawl
-- misc:
-    - DONE: Image sprawl setting
-    - DONE: Container sprawl setting
-    - DONE: Output image name next to container name upon displaying container
-    - Output to slack
-    - stdout colorizing
-    - Link CIS benchmark numbers?
-- ECS agent:
-    - Version check
-    - DONE: Version get
-    - DONE: Get cluster name
-- Info gather:
-    - DONE: Get hostname
-    - DONE: Get instance ID
-    - DONE: Get IP address
-- Image audit:
-    - Ensure they do not have unnecessary packages
-    - Ensure they are not running SSH
-    - Use COPY instead of ADD
-    - Do not store secrets in Dockerfiles
-    - Ensure images are rebuilt with security patches
-        - We use ubuntu:trusty (and others); these images need to be rebuilt when there is a security update related to the base image
+## Overview
+A tool to audit underlying docker host and containers. The audit information comes from CIS benchmarks for Docker.
+
+## Features
+- Output to slack
+
+### Docker Daemon/Host
+- Compare running version with current stable
+- Check live restore
+- Docker file/directory ownership
+- Docker file/directory mode
+- Container sprawl
+- Image sprawl
+- If running ECS, detect the version and cluster
+- Gathers basic host info (IPs, Instance ID (aws), and hostname)
+
+### Docker Containers
+- Check if they are `Privileged`
+- Check if they have `Capabilities`
+- Ensure memory limits are set per container
+- Each container should have HEALTHCHECK
+- Mount propagation
+- Check if container is using ports < 1024
+- Do not allow containers access to hosts process namespace
+- Do not allow containers access to hosts IPC namespace
+- Do not allow containers access to hosts UTS namespace
+- Do not allow containers access to hosts devices
+
+## Usage
+1. Download a release binary.
+2. Before running figure out the Docker API version you're running: `docker version` will tell you.
+3. To run the audit: `env DOCKER_API_VERSION="x.xx" ./dprobe`
+
+### Output
+- `--output`/`-o` supports `slack` or `stdout`; you must configure `dprobe.json` to output to slack.
+- `--csprawl`/`-c` to set container sprawl amount.
+- `--isprawl`/`-i` to set image sprawl amount.
+
+## Todo
+- Check if containers are running outdated image
+- Compare ECS version to stable
+- Disable swarm mode if it's not in use
+- stdout colorizing
+- Link CIS benchmark numbers?
