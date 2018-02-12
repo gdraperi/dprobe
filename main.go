@@ -558,7 +558,7 @@ func SendOutput(output string) error ***REMOVED***
 	if output == "stdout" ***REMOVED***
 		fmt.Println(message)
 	***REMOVED*** else if output == "slack" ***REMOVED***
-
+		ToSlack(message)
 	***REMOVED*** else ***REMOVED***
 		return fmt.Errorf("Invalid output format")
 	***REMOVED***
