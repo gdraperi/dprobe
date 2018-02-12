@@ -1,0 +1,8 @@
+{
+    "csprawl": 10,
+    "isprawl": 10,
+    "slack": {
+        "token": "",
+        "channel": ""
+    }
+}
