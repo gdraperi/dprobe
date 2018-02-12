@@ -536,21 +536,15 @@ func ToSlack(data string) ***REMOVED***
 ***REMOVED***
 
 // MakeOutput formats output based on the type of output
-func MakeOutput(output string, data ...string) error ***REMOVED***
+func MakeOutput(data ...string) error ***REMOVED***
 	var line string
 
-	if output == "stdout" ***REMOVED***
-		for m := range data ***REMOVED***
-			if m != 0 ***REMOVED***
-				line = fmt.Sprintf("%s %s", line, data[m])
-			***REMOVED*** else ***REMOVED***
-				line = fmt.Sprintf("%s%s", line, data[m])
-			***REMOVED***
+	for m := range data ***REMOVED***
+		if m != 0 ***REMOVED***
+			line = fmt.Sprintf("%s %s", line, data[m])
+		***REMOVED*** else ***REMOVED***
+			line = fmt.Sprintf("%s%s", line, data[m])
 		***REMOVED***
-	***REMOVED*** else if output == "slack" ***REMOVED***
-
-	***REMOVED*** else ***REMOVED***
-		return fmt.Errorf("Invalid output format")
 	***REMOVED***
 
 	line = fmt.Sprintf("%s\n", line)
@@ -589,25 +583,25 @@ func main() ***REMOVED***
 		log.Fatal(err)
 	***REMOVED***
 
-	MakeOutput(cfgOutput, "Host Information")
+	MakeOutput("Host Information")
 	iz1, err1 := GetHostname()
 	if err1 != nil ***REMOVED***
 		log.Fatal(err1)
 	***REMOVED***
-	MakeOutput(cfgOutput, "Hostname:", iz1)
+	MakeOutput("Hostname:", iz1)
 
 	iz2, err2 := GetIPs()
 	if err2 != nil ***REMOVED***
 		log.Fatal(err2)
 	***REMOVED***
-	MakeOutput(cfgOutput, iz2...)
+	MakeOutput(iz2...)
 
 	iz3, err3 := GetInstanceID()
 	if err3 != nil ***REMOVED***
 		log.Error(err3)
 	***REMOVED***
 	if len(iz3) > 0 ***REMOVED***
-		MakeOutput(cfgOutput, "Instance ID:", iz3)
+		MakeOutput("Instance ID:", iz3)
 	***REMOVED***
 
 	iz4, err4 := GetECSAgentVersion()
@@ -615,7 +609,7 @@ func main() ***REMOVED***
 		log.Error(err4)
 	***REMOVED***
 	if len(iz4) > 0 ***REMOVED***
-		MakeOutput(cfgOutput, "ECS version:", iz4)
+		MakeOutput("ECS version:", iz4)
 	***REMOVED***
 
 	iz5, err5 := GetECSClusterName()
@@ -623,125 +617,125 @@ func main() ***REMOVED***
 		log.Error(err5)
 	***REMOVED***
 	if len(iz5) > 0 ***REMOVED***
-		MakeOutput(cfgOutput, "ECS Cluster:", iz5)
+		MakeOutput("ECS Cluster:", iz5)
 	***REMOVED***
 
-	MakeOutput(cfgOutput, "\n")
-	MakeOutput(cfgOutput, "Docker Host Audit")
+	MakeOutput("\n")
+	MakeOutput("Docker Host Audit")
 	iz6, err6 := HasContainerSprawl(cli, int(cfgContainerSprawl))
 	if err6 != nil ***REMOVED***
 		log.Error(err6)
 	***REMOVED***
 	strconv.FormatBool(iz6)
-	MakeOutput(cfgOutput, "Container sprawl:", strconv.FormatBool(iz6))
+	MakeOutput("Container sprawl:", strconv.FormatBool(iz6))
 
 	iz7, err7 := HasImageSprawl(cli, int(cfgImageSprawl))
 	if err7 != nil ***REMOVED***
 		log.Error(err7)
 	***REMOVED***
 	strconv.FormatBool(iz7)
-	MakeOutput(cfgOutput, "Image sprawl:", strconv.FormatBool(iz7))
+	MakeOutput("Image sprawl:", strconv.FormatBool(iz7))
 
 	iz17, err17 := HasStableDockerCEVersion()
 	if err17 != nil ***REMOVED***
 		log.Error(err17)
 	***REMOVED***
-	MakeOutput(cfgOutput, "Stable docker version:", strconv.FormatBool(iz17))
+	MakeOutput("Stable docker version:", strconv.FormatBool(iz17))
 
 	iz18, err18 := HasLiveRestore(cli)
 	if err18 != nil ***REMOVED***
 		log.Error(err18)
 	***REMOVED***
-	MakeOutput(cfgOutput, "Live Restore:", strconv.FormatBool(iz18))
+	MakeOutput("Live Restore:", strconv.FormatBool(iz18))
 
 	iz19, err19 := FileOwnedByRoot("/var/lib/docker")
 	if err19 != nil ***REMOVED***
 		log.Error(err19)
 	***REMOVED***
-	MakeOutput(cfgOutput, "/var/lib/docker owned by root:", strconv.FormatBool(iz19))
+	MakeOutput("/var/lib/docker owned by root:", strconv.FormatBool(iz19))
 
 	iz20, err20 := FileOwnedByRoot("/etc/docker")
 	if err20 != nil ***REMOVED***
 		log.Error(err20)
 	***REMOVED***
-	MakeOutput(cfgOutput, "/etc/docker owned by root:", strconv.FormatBool(iz20))
+	MakeOutput("/etc/docker owned by root:", strconv.FormatBool(iz20))
 
 	iz21, err21 := FileOwnedByRoot("/etc/docker/daemon.json")
 	if err21 != nil ***REMOVED***
 		log.Error(err21)
 	***REMOVED***
-	MakeOutput(cfgOutput, "/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
+	MakeOutput("/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
 
 	iz22, err22 := FileOwnedByRoot("/usr/bin/docker-containerd")
 	if err22 != nil ***REMOVED***
 		log.Error(err22)
 	***REMOVED***
-	MakeOutput(cfgOutput, "/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
+	MakeOutput("/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
 
 	iz23, err23 := FileOwnedByRoot("/usr/bin/docker-runc")
 	if err23 != nil ***REMOVED***
 		log.Error(err23)
 	***REMOVED***
-	MakeOutput(cfgOutput, "/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
+	MakeOutput("/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
 
 	for c := range containers ***REMOVED***
 		img := fmt.Sprintf("(%s)", containers[c].Image)
-		MakeOutput(cfgOutput, "\n")
-		MakeOutput(cfgOutput, "Container:", containers[c].ID, img)
+		MakeOutput("\n")
+		MakeOutput("Container:", containers[c].ID, img)
 
 		iz8, err8 := HasPrivilegedExecution(cli, containers[c].ID)
 		if err8 != nil ***REMOVED***
 			log.Error(err8)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Privileged Execution:", strconv.FormatBool(iz8))
+		MakeOutput("Privileged Execution:", strconv.FormatBool(iz8))
 
 		iz9, err9 := HasExtendedCapabilities(cli, containers[c].ID)
 		if err9 != nil ***REMOVED***
 			log.Error(err9)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Extended Capabilities:", strconv.FormatBool(iz9))
+		MakeOutput("Extended Capabilities:", strconv.FormatBool(iz9))
 
 		iz10, err10 := HasHealthcheck(cli, containers[c].ID)
 		if err10 != nil ***REMOVED***
 			log.Error(err10)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Memory limit:", strconv.FormatBool(iz10))
+		MakeOutput("Memory limit:", strconv.FormatBool(iz10))
 
 		iz11, err11 := HasSharedMountPropagation(cli, containers[c].ID)
 		if err11 != nil ***REMOVED***
 			log.Error(err11)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Shared Propagation:", strconv.FormatBool(iz11))
+		MakeOutput("Shared Propagation:", strconv.FormatBool(iz11))
 
 		iz12, err12 := HasPrivilegedPorts(cli, containers[c].ID)
 		if err12 != nil ***REMOVED***
 			log.Error(err12)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Privileged Ports:", strconv.FormatBool(iz12))
+		MakeOutput("Privileged Ports:", strconv.FormatBool(iz12))
 
 		iz13, err13 := HasUTSModeHost(cli, containers[c].ID)
 		if err13 != nil ***REMOVED***
 			log.Error(err13)
 		***REMOVED***
-		MakeOutput(cfgOutput, "UTS Mode Host:", strconv.FormatBool(iz13))
+		MakeOutput("UTS Mode Host:", strconv.FormatBool(iz13))
 
 		iz14, err14 := HasIPCModeHost(cli, containers[c].ID)
 		if err14 != nil ***REMOVED***
 			log.Error(err14)
 		***REMOVED***
-		MakeOutput(cfgOutput, "IPC Mode Host:", strconv.FormatBool(iz14))
+		MakeOutput("IPC Mode Host:", strconv.FormatBool(iz14))
 
 		iz15, err15 := HasProcessModeHost(cli, containers[c].ID)
 		if err15 != nil ***REMOVED***
 			log.Error(err15)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Process Mode Host:", strconv.FormatBool(iz15))
+		MakeOutput("Process Mode Host:", strconv.FormatBool(iz15))
 
 		iz16, err16 := HasHostDevices(cli, containers[c].ID)
 		if err16 != nil ***REMOVED***
 			log.Error(err16)
 		***REMOVED***
-		MakeOutput(cfgOutput, "Has Host Devices:", strconv.FormatBool(iz16))
+		MakeOutput("Has Host Devices:", strconv.FormatBool(iz16))
 	***REMOVED***
 
 	SendOutput(cfgOutput)
