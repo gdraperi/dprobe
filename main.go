@@ -599,7 +599,12 @@ func MakeOutput(data ...string) error {
 // SendOutput used to send the output to the defined location
 func SendOutput(output string, report Report) error {
 	if output == "stdout" {
-		fmt.Printf("%+v\n", report)
+		jsonReport, err1 := json.Marshal(report)
+		if err1 != nil {
+			log.Error(err1)
+		}
+
+		fmt.Printf("%+v\n", string(jsonReport))
 	} else if output == "slack" {
 		ToSlack(report)
 	} else {
