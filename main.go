@@ -66,10 +66,34 @@ type Report struct {
 
 // Container contains audit information for each container queried
 type Container struct {
+	ContainerID          string
+	Image                string
+	Privileged           bool
+	ExtendedCapabilities bool
+	MemoryLimit          bool
+	SharedPropagation    bool
+	PrivilegedPorts      bool
+	UTSModeHost          bool
+	IPCModeHost          bool
+	ProcessModeHost      bool
+	HostDevices          bool
 }
 
 // DockerHost contains audit information for the underlying docker host
 type DockerHost struct {
+	Hostname                          string
+	IPs                               []string
+	InstanceID                        string
+	ECSVersion                        string
+	ECSCluster                        string
+	ContainerSprawl                   bool
+	ImageSprawl                       bool
+	LiveRestore                       bool
+	VarLibDockerOwnedByRoot           bool
+	EtcDockerOwnedByRoot              bool
+	EtcDockerDaemonJsonOwnedByRoot    bool
+	UsrBinDockerContainerdOwnedByRoot bool
+	UsrBinDockerRuncOwnedByRoot       bool
 }
 
 func setFlags() {
