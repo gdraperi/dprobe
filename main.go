@@ -59,42 +59,42 @@ type Slack struct {
 
 // Report is the generalized struct that holds the report data
 type Report struct {
-	DockerHost DockerHost
-	Containers []Container
+	DockerHost DockerHost  `json:"docker_host"`
+	Containers []Container `json:"containers"`
 }
 
 // Container contains audit information for each container queried
 type Container struct {
-	ContainerID          string
-	Image                string
-	Privileged           bool
-	ExtendedCapabilities bool
-	HealthCheck          bool
-	MemoryLimit          bool
-	SharedPropagation    bool
-	PrivilegedPorts      bool
-	UTSModeHost          bool
-	IPCModeHost          bool
-	ProcessModeHost      bool
-	HostDevices          bool
+	ContainerID          string `json:"container_id"`
+	Image                string `json:"image"`
+	Privileged           bool   `json:"privileged"`
+	ExtendedCapabilities bool   `json:"extended_capabilities"`
+	HealthCheck          bool   `json:"health_check"`
+	MemoryLimit          bool   `json:"memory_limit"`
+	SharedPropagation    bool   `json:"shared_propagation"`
+	PrivilegedPorts      bool   `json:"privileged_ports"`
+	UTSModeHost          bool   `json:"uts_mode_host"`
+	IPCModeHost          bool   `json:"ipc_mode_host"`
+	ProcessModeHost      bool   `json:"process_mode_host"`
+	HostDevices          bool   `json:"host_devices"`
 }
 
 // DockerHost contains audit information for the underlying docker host
 type DockerHost struct {
-	Hostname                          string
-	IPs                               []string
-	InstanceID                        string
-	ECSVersion                        string
-	ECSCluster                        string
-	ContainerSprawl                   bool
-	ImageSprawl                       bool
-	StableDockerVersion               bool
-	LiveRestore                       bool
-	VarLibDockerOwnedByRoot           bool
-	EtcDockerOwnedByRoot              bool
-	EtcDockerDaemonJsonOwnedByRoot    bool
-	UsrBinDockerContainerdOwnedByRoot bool
-	UsrBinDockerRuncOwnedByRoot       bool
+	Hostname                          string   `json:"hostname"`
+	IPs                               []string `json:"IPs"`
+	InstanceID                        string   `json:"instance_id",omitempty`
+	ECSVersion                        string   `json:"ecs_version",omitempty`
+	ECSCluster                        string   `json:"ecs_cluster",omitempty`
+	ContainerSprawl                   bool     `json:"container_sprawl"`
+	ImageSprawl                       bool     `json:"image_sprawl"`
+	StableDockerVersion               bool     `json:"stable_docker_version"`
+	LiveRestore                       bool     `json:"live_restore"`
+	VarLibDockerOwnedByRoot           bool     `json:"/var/lib/docker owned by root"`
+	EtcDockerOwnedByRoot              bool     `json:"/etc/docker owned by root"`
+	EtcDockerDaemonJsonOwnedByRoot    bool     `json:"/etc/docker/daemon.json owned by root"`
+	UsrBinDockerContainerdOwnedByRoot bool     `json:"/usr/bin/docker-containerd owned by root"`
+	UsrBinDockerRuncOwnedByRoot       bool     `json:"/usr/bin/docker-runc owned by root"`
 }
 
 func setFlags() {
