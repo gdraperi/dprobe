@@ -564,17 +564,29 @@ func GetECSClusterName() (string, error) {
 // ToSlack writes the parsed feed data to a slack channel
 func ToSlack(report Report) {
 	api := slack.New(cfgSlack.Token)
-	params := slack.PostMessageParameters{}
 
 	jsonReport, err1 := json.MarshalIndent(report, "", "  ")
 	if err1 != nil {
 		log.Error(err1)
 	}
 
-	_, _, err2 := api.PostMessage(cfgSlack.Channel, string(jsonReport), params)
+	var title string
 
-	if err2 != nil {
-		log.Error(err2)
+	if report.DockerHost.ECSCluster != "" {
+		title = fmt.Sprintf("%s (%s)", report.DockerHost.Hostname, report.DockerHost.ECSCluster)
+	} else {
+		title = fmt.Sprintf("%s", report.DockerHost.Hostname)
+	}
+
+	var fupload slack.FileUploadParameters
+	fupload.Channels = []string{cfgSlack.Channel}
+	fupload.Content = string(jsonReport)
+	fupload.Filetype = "javascript"
+	fupload.Title = title
+
+	_, err3 := api.UploadFile(fupload)
+	if err3 != nil {
+		log.Error(err3)
 	}
 }
 
