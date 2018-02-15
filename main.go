@@ -58,6 +58,20 @@ type Slack struct {
 	Token   string
 }
 
+// Report is the generalized struct that holds the report data
+type Report struct {
+	DockerHost DockerHost
+	Containers []Container
+}
+
+// Container contains audit information for each container queried
+type Container struct {
+}
+
+// DockerHost contains audit information for the underlying docker host
+type DockerHost struct {
+}
+
 func setFlags() {
 	rootCmd.PersistentFlags().StringVarP(&cfgOutput, "output", "o", "stdout", "Sets the output method (slack, or stdout)")
 	rootCmd.PersistentFlags().Uint32VarP(&cfgImageSprawl, "isprawl", "i", 100, "Sets the minimum amount of images on a host to trip the image sprawl flag")
