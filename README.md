@@ -6,6 +6,8 @@ A tool to audit underlying docker host and containers. The audit information com
 
 ## Features
 - Output to slack
+- **New** All output is now sent as JSON
+- **New** When sending to slack, the audit data is sent as a snippet
 
 ### Docker Daemon/Host
 - Compare running version with current stable
