@@ -562,15 +562,19 @@ func GetECSClusterName() (string, error) {
 }
 
 // ToSlack writes the parsed feed data to a slack channel
-func ToSlack(data string) {
+func ToSlack(report Report) {
 	api := slack.New(cfgSlack.Token)
-
 	params := slack.PostMessageParameters{}
 
-	_, _, err := api.PostMessage(cfgSlack.Channel, data, params)
+	jsonReport, err1 := json.Marshal(report)
+	if err1 != nil {
+		log.Error(err1)
+	}
 
-	if err != nil {
-		log.Error(err)
+	_, _, err2 := api.PostMessage(cfgSlack.Channel, string(jsonReport), params)
+
+	if err2 != nil {
+		log.Error(err2)
 	}
 }
 
@@ -593,11 +597,11 @@ func MakeOutput(data ...string) error {
 }
 
 // SendOutput used to send the output to the defined location
-func SendOutput(output string) error {
+func SendOutput(output string, report Report) error {
 	if output == "stdout" {
-		fmt.Println(message)
+		fmt.Printf("%+v\n", report)
 	} else if output == "slack" {
-		ToSlack(message)
+		ToSlack(report)
 	} else {
 		return fmt.Errorf("Invalid output format")
 	}
@@ -780,5 +784,5 @@ func main() {
 		report.Containers = append(report.Containers, container)
 	}
 
-	SendOutput(cfgOutput)
+	SendOutput(cfgOutput, report)
 }
