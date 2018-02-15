@@ -88,6 +88,7 @@ type DockerHost struct {
 	ECSCluster                        string
 	ContainerSprawl                   bool
 	ImageSprawl                       bool
+	StableDockerVersion               bool
 	LiveRestore                       bool
 	VarLibDockerOwnedByRoot           bool
 	EtcDockerOwnedByRoot              bool
@@ -608,6 +609,9 @@ func main() {
 	PreInit()
 	InitViper()
 
+	var report Report
+	var dockerHost DockerHost
+
 	var err error
 
 	cli, err = client.NewEnvClient()
@@ -626,20 +630,20 @@ func main() {
 	if err1 != nil {
 		log.Fatal(err1)
 	}
-	MakeOutput("Hostname:", iz1)
+	dockerHost.Hostname = iz1
 
 	iz2, err2 := GetIPs()
 	if err2 != nil {
 		log.Fatal(err2)
 	}
-	MakeOutput(iz2...)
+	dockerHost.IPs = iz2
 
 	iz3, err3 := GetInstanceID()
 	if err3 != nil {
 		log.Error(err3)
 	}
 	if len(iz3) > 0 {
-		MakeOutput("Instance ID:", iz3)
+		dockerHost.InstanceID = iz3
 	}
 
 	iz4, err4 := GetECSAgentVersion()
@@ -647,7 +651,7 @@ func main() {
 		log.Error(err4)
 	}
 	if len(iz4) > 0 {
-		MakeOutput("ECS version:", iz4)
+		dockerHost.ECSVersion = iz4
 	}
 
 	iz5, err5 := GetECSClusterName()
@@ -655,68 +659,66 @@ func main() {
 		log.Error(err5)
 	}
 	if len(iz5) > 0 {
-		MakeOutput("ECS Cluster:", iz5)
+		dockerHost.ECSCluster = iz5
 	}
 
-	MakeOutput("\n")
-	MakeOutput("Docker Host Audit")
 	iz6, err6 := HasContainerSprawl(cli, int(cfgContainerSprawl))
 	if err6 != nil {
 		log.Error(err6)
 	}
-	strconv.FormatBool(iz6)
-	MakeOutput("Container sprawl:", strconv.FormatBool(iz6))
+	dockerHost.ContainerSprawl = iz6
 
 	iz7, err7 := HasImageSprawl(cli, int(cfgImageSprawl))
 	if err7 != nil {
 		log.Error(err7)
 	}
-	strconv.FormatBool(iz7)
-	MakeOutput("Image sprawl:", strconv.FormatBool(iz7))
+	dockerHost.ImageSprawl = iz7
 
 	iz17, err17 := HasStableDockerCEVersion()
 	if err17 != nil {
 		log.Error(err17)
 	}
-	MakeOutput("Stable docker version:", strconv.FormatBool(iz17))
+	dockerHost.StableDockerVersion = iz17
 
 	iz18, err18 := HasLiveRestore(cli)
 	if err18 != nil {
 		log.Error(err18)
 	}
-	MakeOutput("Live Restore:", strconv.FormatBool(iz18))
+	dockerHost.LiveRestore = iz18
 
 	iz19, err19 := FileOwnedByRoot("/var/lib/docker")
 	if err19 != nil {
 		log.Error(err19)
 	}
-	MakeOutput("/var/lib/docker owned by root:", strconv.FormatBool(iz19))
+	dockerHost.VarLibDockerOwnedByRoot = iz19
 
 	iz20, err20 := FileOwnedByRoot("/etc/docker")
 	if err20 != nil {
 		log.Error(err20)
 	}
-	MakeOutput("/etc/docker owned by root:", strconv.FormatBool(iz20))
+	dockerHost.EtcDockerOwnedByRoot = iz20
 
 	iz21, err21 := FileOwnedByRoot("/etc/docker/daemon.json")
 	if err21 != nil {
 		log.Error(err21)
 	}
-	MakeOutput("/etc/docker/daemon.json owned by root:", strconv.FormatBool(iz21))
+	dockerHost.EtcDockerDaemonJsonOwnedByRoot = iz21
 
 	iz22, err22 := FileOwnedByRoot("/usr/bin/docker-containerd")
 	if err22 != nil {
 		log.Error(err22)
 	}
-	MakeOutput("/usr/bin/docker-containerd owned by root:", strconv.FormatBool(iz22))
+	dockerHost.UsrBinDockerContainerdOwnedByRoot = iz22
 
 	iz23, err23 := FileOwnedByRoot("/usr/bin/docker-runc")
 	if err23 != nil {
 		log.Error(err23)
 	}
-	MakeOutput("/usr/bin/docker-runc owned by root:", strconv.FormatBool(iz23))
+	dockerHost.UsrBinDockerRuncOwnedByRoot = iz23
+    report.DockerHost = dockerHost
 
 	for c := range containers {
+        var container
 		img := fmt.Sprintf("(%s)", containers[c].Image)
 		MakeOutput("\n")
 		MakeOutput("Container:", containers[c].ID, img)
