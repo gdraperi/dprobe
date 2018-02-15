@@ -566,7 +566,7 @@ func ToSlack(report Report) {
 	api := slack.New(cfgSlack.Token)
 	params := slack.PostMessageParameters{}
 
-	jsonReport, err1 := json.Marshal(report)
+	jsonReport, err1 := json.MarshalIndent(report, "", "  ")
 	if err1 != nil {
 		log.Error(err1)
 	}
@@ -599,7 +599,7 @@ func MakeOutput(data ...string) error {
 // SendOutput used to send the output to the defined location
 func SendOutput(output string, report Report) error {
 	if output == "stdout" {
-		jsonReport, err1 := json.Marshal(report)
+		jsonReport, err1 := json.MarshalIndent(report, "", "  ")
 		if err1 != nil {
 			log.Error(err1)
 		}
