@@ -8,7 +8,6 @@ import (
 	"net"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"syscall"
 
@@ -70,6 +69,7 @@ type Container struct {
 	Image                string
 	Privileged           bool
 	ExtendedCapabilities bool
+	HealthCheck          bool
 	MemoryLimit          bool
 	SharedPropagation    bool
 	PrivilegedPorts      bool
@@ -715,67 +715,69 @@ func main() {
 		log.Error(err23)
 	}
 	dockerHost.UsrBinDockerRuncOwnedByRoot = iz23
-    report.DockerHost = dockerHost
+	report.DockerHost = dockerHost
 
 	for c := range containers {
-        var container
-		img := fmt.Sprintf("(%s)", containers[c].Image)
-		MakeOutput("\n")
-		MakeOutput("Container:", containers[c].ID, img)
+		var container Container
+
+		container.Image = containers[c].Image
+		container.ContainerID = containers[c].ID
 
 		iz8, err8 := HasPrivilegedExecution(cli, containers[c].ID)
 		if err8 != nil {
 			log.Error(err8)
 		}
-		MakeOutput("Privileged Execution:", strconv.FormatBool(iz8))
+		container.Privileged = iz8
 
 		iz9, err9 := HasExtendedCapabilities(cli, containers[c].ID)
 		if err9 != nil {
 			log.Error(err9)
 		}
-		MakeOutput("Extended Capabilities:", strconv.FormatBool(iz9))
+		container.ExtendedCapabilities = iz9
 
 		iz10, err10 := HasHealthcheck(cli, containers[c].ID)
 		if err10 != nil {
 			log.Error(err10)
 		}
-		MakeOutput("Memory limit:", strconv.FormatBool(iz10))
+		container.HealthCheck = iz10
 
 		iz11, err11 := HasSharedMountPropagation(cli, containers[c].ID)
 		if err11 != nil {
 			log.Error(err11)
 		}
-		MakeOutput("Shared Propagation:", strconv.FormatBool(iz11))
+		container.SharedPropagation = iz11
 
 		iz12, err12 := HasPrivilegedPorts(cli, containers[c].ID)
 		if err12 != nil {
 			log.Error(err12)
 		}
-		MakeOutput("Privileged Ports:", strconv.FormatBool(iz12))
+		container.PrivilegedPorts = iz12
 
 		iz13, err13 := HasUTSModeHost(cli, containers[c].ID)
 		if err13 != nil {
 			log.Error(err13)
 		}
-		MakeOutput("UTS Mode Host:", strconv.FormatBool(iz13))
+		container.UTSModeHost = iz13
 
 		iz14, err14 := HasIPCModeHost(cli, containers[c].ID)
 		if err14 != nil {
 			log.Error(err14)
 		}
-		MakeOutput("IPC Mode Host:", strconv.FormatBool(iz14))
+		container.IPCModeHost = iz14
 
 		iz15, err15 := HasProcessModeHost(cli, containers[c].ID)
 		if err15 != nil {
 			log.Error(err15)
 		}
-		MakeOutput("Process Mode Host:", strconv.FormatBool(iz15))
+		container.ProcessModeHost = iz15
 
 		iz16, err16 := HasHostDevices(cli, containers[c].ID)
 		if err16 != nil {
 			log.Error(err16)
 		}
-		MakeOutput("Has Host Devices:", strconv.FormatBool(iz16))
+		container.HostDevices = iz16
+
+		report.Containers = append(report.Containers, container)
 	}
 
 	SendOutput(cfgOutput)
