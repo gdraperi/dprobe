@@ -98,6 +98,7 @@ type DockerHost struct {
 }
 
 func setFlags() {
+	rootCmd.PersistentFlags().BoolVarP(&cfgDebug, "debug", "d", false, "Enables debug output")
 	rootCmd.PersistentFlags().StringVarP(&cfgOutput, "output", "o", "stdout", "Sets the output method (slack, or stdout)")
 	rootCmd.PersistentFlags().Uint32VarP(&cfgImageSprawl, "isprawl", "i", 100, "Sets the minimum amount of images on a host to trip the image sprawl flag")
 	rootCmd.PersistentFlags().Uint32VarP(&cfgContainerSprawl, "csprawl", "c", 100, "Sets the minimum amount of containers on a host to trip the container sprawl flag")
@@ -162,8 +163,10 @@ func InitViper() {
 	}
 
 	if cfgDebug {
-		log.Println(viper.AllSettings())
+		log.SetLevel(log.DebugLevel)
 	}
+
+	log.Debug(viper.AllSettings())
 }
 
 // GetContainers returns all containers
